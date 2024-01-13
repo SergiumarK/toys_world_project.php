@@ -13,14 +13,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+    <title>Add product</title>
 </head>
 <body>
-    <nav>
-        <a href="./products.php">Products</a>
-        <a href="./create.php">Add</a>
-        <a href="./update.php">Edit</a>
-        <a href="./delete.php">Delete</a>
-    </nav>
+    <h1>Add product</h1>
+    <form action="./admin.php" method="POST">
+        <input type="text" name="title" placeholder="Title" required>
+        <textarea name="description" id="" cols="30" rows="5" placeholder="description"></textarea>
+        <input type="number" name="price" placeholder="Price" required step="0.01">
+        <button type="submit" name="create" >Add</button>
+    </form>
 </body>
 </html>
