@@ -30,6 +30,16 @@
 
             header("Location: ./update.php");
         }
+
+        if (isset($_POST["delete"])) {
+            $productId = sanitizeInput($_POST["product_id"]);
+
+            $stmt = $conn -> prepare("DELETE FROM products WHERE id = ?"); 
+            $stmt -> bind_param("i", $productId);
+            $stmt -> execute();
+
+            header("Location: ./delete.php");
+        }
     }
         
 ?>
