@@ -17,10 +17,12 @@
 </head>
 <body>
     <h1>Add product</h1>
-    <form action="./admin.php" method="POST">
+    <form action="./admin.php" method="POST" enctype="multipart/form-data">
         <input type="text" name="title" placeholder="Title" required>
         <textarea name="description" id="" cols="30" rows="5" placeholder="description"></textarea>
         <input type="number" name="price" placeholder="Price" required step="0.01">
+        <label for="images">Images</label>
+        <input type="file" name="images[]" id="images" multiple accept="image/webp">
         <button type="submit" name="create" >Add</button>
     </form>
 </body>

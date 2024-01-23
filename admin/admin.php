@@ -15,7 +15,53 @@
             $stmt -> bind_param("ssd", $title, $description, $price);
             $stmt -> execute();
 
-            header("Location: ./create.php");
+            // Get product_id
+            $stmt2 = $conn -> prepare("SELECT * FROM products WHERE title = ?");
+            $stmt2 -> bind_param("s", $title);
+            $stmt2 -> execute();
+            $result = $stmt2 -> get_result();
+            $product = $result -> fetch_assoc();
+            
+
+            // Upload images
+
+            if (isset($_FILES["images"]) ) {
+                // verificam daca nu avem reori
+                foreach ($_FILES["images"]["error"] as $imgError) {
+                    if ($imgError > 0) {
+                        die("one or many of images have errors");
+                    }
+                }
+
+                $folder = "uploads/";
+                
+                for ($i = 0; $i < count($_FILES["images"]["name"]); $i++) {
+
+                    // unique name
+                    $uniqueName = uniqid() . $_FILES["images"]["name"][$i];
+                    
+                    // size
+                    if ($_FILES["images"]["size"][$i] > 5000000) {
+                        die("One or many of the images > 5 MB.");
+                    }
+
+                    // type
+                    $ext = strtolower(pathinfo($_FILES["images"]["name"][$i], PATHINFO_EXTENSION));
+                    IF ($ext !== "webp") {
+                        die("One or many of the images is not .webp");
+                    }
+
+                    // Upload image
+                    if (move_uploaded_file($_FILES["images"]["tmp_name"][$i], $folder . $uniqueName)) {
+                        $stmt3 = $conn -> prepare("INSERT INTO product_images(url, product_id) VALUES(?, ?)");
+                        $stmt3 -> bind_param("si", $uniqueName, $product["id"]);
+                        $stmt3 -> execute();
+                    }
+                }
+            }
+            
+
+            // header("Location: ./create.php");
         }
 
         if (isset($_POST["update"])) {
@@ -40,6 +86,5 @@
 
             header("Location: ./delete.php");
         }
-    }
-        
+    }   
 ?>
