@@ -86,5 +86,79 @@
 
             header("Location: ./delete.php");
         }
-    }   
+
+        if (isset($_POST["update-images"])) {
+            $productId = sanitizeInput($_POST["product_id"]);
+        
+            // Delete old images from folder
+            $stmt = $conn->prepare("SELECT * FROM product_images WHERE product_id = ?");
+            $stmt->bind_param("i", $productId);
+            $stmt->execute();
+            $results = $stmt->get_result();
+            
+            while ($row = $results->fetch_assoc()) {
+                unlink("uploads/" . $row["url"]);
+            }
+        
+            // Delete old images from table
+            $stmt2 = $conn->prepare("DELETE FROM product_images WHERE product_id = ?");
+            $stmt2->bind_param("i", $productId);
+            $stmt2->execute();
+        
+            // Upload new images
+            if (isset($_FILES["images"])) {
+                foreach ($_FILES["images"]["error"] as $imgError) {
+                    if ($imgError > 0) {
+                        die("One or many of the images have errors.");
+                    }
+                }
+        
+                $folder = "uploads/";
+        
+                for ($i = 0; $i < count($_FILES["images"]["name"]); $i++) {
+                    // Unique name
+                    $uniqueName = uniqid() . $_FILES["images"]["name"][$i];
+        
+                    // Check size
+                    if ($_FILES["images"]["size"][$i] > 5000000) {
+                        die("One or many of the images > 5 MB.");
+                    }
+        
+                    // Check type
+                    $ext = strtolower(pathinfo($_FILES["images"]["name"][$i], PATHINFO_EXTENSION));
+                    if ($ext !== "webp") {
+                        die("One or many of the images is not .webp");
+                    }
+        
+                    // Upload image
+                    if (move_uploaded_file($_FILES["images"]["tmp_name"][$i], $folder . $uniqueName)) {
+                        $stmt3 = $conn->prepare("INSERT INTO product_images(url, product_id) VALUES (?, ?)");
+                        $stmt3->bind_param("si", $uniqueName, $productId);
+                        $stmt3->execute();
+                    }
+                }
+            }
+            
+            header("Location: ./update.php");
+        }
+        
+        if (isset($_POST["soft-delete"])) {
+            $productId = sanitizeInput($_POST["product_id"]);
+            if (isset($_POST["hidden"]) && $_POST["hidden"] === "1")
+            {
+                //Hide 
+                $hidden = 1;
+                $sql = "UPDATE products SET hidden = ? WHERE id = ?";
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param("ii", $hidden, $productId);
+                $stmt->execute();
+            } else {
+                $hidden = 0;
+                $sql = "UPDATE products SET hidden = ? WHERE id = ?";
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param("ii", $hidden, $productId);
+                $stmt->execute();
+            }
+        }
+    }
 ?>
