@@ -159,6 +159,7 @@
                 $stmt->bind_param("ii", $hidden, $productId);
                 $stmt->execute();
             }
+            header("Location: ./update.php");
         }
     }
 ?>

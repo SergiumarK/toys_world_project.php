@@ -73,7 +73,7 @@
                 }
             ?>
         </select>
-        <label for="hidden">hidden:
+        <label for="hidden">Hidden:
             <input type="checkbox" name="hidden" value="1">
         </label>
         <button type="submit" name="soft-delete">Save</button>
