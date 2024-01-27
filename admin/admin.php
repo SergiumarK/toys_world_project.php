@@ -184,5 +184,16 @@
             $stmt -> execute();
             header ("Location: ../saves.php");
         }
+
+        if (isset($_POST["delete-save"])) {
+            $productId = $_POST["product_id"];
+            $userId = $_SESSION["user_id"];
+
+            $sql = "DELETE FROM saves WHERE product_id = ? AND user_id = ?";
+            $stmt = $conn -> prepare($sql);
+            $stmt -> bind_param("ii", $productId, $userId);
+            $stmt -> execute();
+            header("Location: ../saves.php");
+        }
     }
 ?>
