@@ -161,5 +161,28 @@
             }
             header("Location: ./update.php");
         }
+
+        if (isset($_POST["save"])) {
+            if (!isset($_SESSION["user_id"])) {
+                header ("Location: ./login.php");
+            }
+            $productId = sanitizeInput($_POST["product_id"]);
+            $userId = $_SESSION["user_id"];
+
+            // Verificam dacca produsul nu exista deja in tabelul de produse salvate
+            $sqlCheck = "SELECT * FROM saves WHERE product_id = ? AND user_id = ?";
+            $stmtCheck = $conn -> prepare($sqlCheck);
+            $stmtCheck -> bind_param("ii", $productId, $userId);
+            $stmtCheck -> execute();
+            $result = $stmtCheck -> get_result();
+            $save = $result -> fetch_assoc();
+            if ($save) die("Product already saved");
+
+            $sql = "INSERT INTO saves(product_id, user_id) VALUES (?, ?)";
+            $stmt = $conn -> prepare($sql);
+            $stmt -> bind_param("ii", $productId, $userId);
+            $stmt -> execute();
+            header ("Location: ../saves.php");
+        }
     }
 ?>

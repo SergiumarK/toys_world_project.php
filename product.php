@@ -21,6 +21,9 @@
 </head>
 <body>
     <?php
+        include_once "./header.php";
+    ?>
+    <?php
         $images = explode(",", $product["image_urls"]);
         foreach($images as $image) {
             echo "<img loading='lazy' src='./admin/uploads/$image' alt='Product image' height='250px'>";
@@ -29,5 +32,13 @@
     <h1><?= $product["title"] ?></h1>
     <p><?= $product["description"] ?></p>
     <p><strong><?= $product["price"] ?> MDL</strong></p>
+    <form action='./admin/admin.php' method='post'>
+        <input type="hidden" name="product_id" value=<?php $product["id"] ?>>
+        <button type="submit" name="save">Save</button>
+    </form>
+    <form action="./admin/admin.php" method='post'>
+        <input type="hidden" name="product_id" value=<?php $product["id"] ?>>
+        <button type="submit" name="cart">Add to cart</button>
+    </form>
 </body>
 </html>

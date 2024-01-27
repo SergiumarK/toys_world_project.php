@@ -16,6 +16,9 @@
     <title>Home - Toys World</title>
 </head>
 <body>
+    <?php
+        include_once "./header.php";
+    ?>
     <!-- Slider -->
     <!-- Filter -->
     <!-- Sort -->
@@ -32,6 +35,14 @@
                     <h2>$product[title]</h2>
                     <p><strong>$product[price] MDL</strong></p>
                     <a href='product.php?id=$product[id]'>See product</a>
+                    <form action='./admin/admin.php' method='post'>
+                        <input type='hidden' name='product_id' value='$product[id]'>
+                        <button type='submit' name='save'>Save</button>
+                    </form>
+                    <form action='./admin/admin.php' method='post'>
+                        <input type='hidden' name='product_id' value='$product[id]'>
+                        <button type='submit' name='cart'>Add to cart</button>
+                    </form>
                 </div>";
             }
         ?>
