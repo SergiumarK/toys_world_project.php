@@ -195,5 +195,58 @@
             $stmt -> execute();
             header("Location: ../saves.php");
         }
+
+        if (isset($_POST["cart"])) {
+            if (!isset($_SESSION["user_id"])) {
+                header ("Location: ./login.php");
+            }
+            $productId = sanitizeInput($_POST["product_id"]);
+            $userId = $_SESSION["user_id"];
+
+            // Verificam dacca produsul nu exista deja in tabelul de produse salvate
+            $sqlCheck = "SELECT * FROM cart WHERE product_id = ? AND user_id = ?";
+            $stmtCheck = $conn -> prepare($sqlCheck);
+            $stmtCheck -> bind_param("ii", $productId, $userId);
+            $stmtCheck -> execute();
+            $result = $stmtCheck -> get_result();
+            $cartItem = $result -> fetch_assoc();
+            if ($cartItem) die("Product already in cart");
+
+            $sql = "INSERT INTO cart(product_id, user_id) VALUES (?, ?)";
+            $stmt = $conn -> prepare($sql);
+            $stmt -> bind_param("ii", $productId, $userId);
+            $stmt -> execute();
+            header ("Location: ../cart.php");
+        }
+
+        if(isset($_POST["quantity-cart"])) {
+            $productId = $_POST["product_id"];
+            $type = $_POST["type"];
+            $userId = $_SESSION["user_id"];
+
+            // Primim cantitatea curenta a unui produs
+            $sql1 = "SELECT * FROM cart WHERE product_id = ? AND user_id = ?";
+            $stmt1 = $conn -> prepare($sql1);
+            $stmt1 -> bind_param("ii", $productId, $userId);
+            $stmt1 -> execute();
+            $result = $stmt1 -> get_result();
+            $cartItem = $result -> fetch_assoc();
+
+            $quantity = $cartItem["quantity"];
+            
+            if ($quantity > 1 && $type === "subtract") {
+                $quantity -= 1;
+            }
+
+            if ($type === "add") {
+                $quantity += 1;
+            }
+
+            $sql2 = "UPDATE cart SET quantity = ? WHERE id = ?";
+            $stmt2 = $conn -> prepare($sql2);
+            $stmt2 -> bind_param("ii", $quantity, $cartItem["id"]);
+            $stmt2 -> execute();
+            header("Location: ../cart.php");
+        }
     }
 ?>
